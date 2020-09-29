@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+
+	<%-include('header')%>
+
+</head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js" defer ></script>
+
+<body>
+<div class="other">
+	<%-include('../appBar')%>
+<div class="container">
+	<br>
+	<h4>Request to make you a Admin</h4>
+	<br>
+	<form id="request">
+  <div class="form-group">
+    <label for="formGroupExampleInput">Enter Name</label>
+    <input type="text" class="form-control" required id="name" placeholder="Race Solutions">
+  </div>
+  <div class="form-group">
+    <label for="formGroupExampleInput2">phoneNumber</label>
+    <input type="number" class="form-control"  id="number" placeholder="Enter valid mob no" required>
+  </div>
+	<button type="submit" class="btn btn-primary" name="button">Send Request</button>
+</form>
+	<div class="row">
+	  <div class="col-sm-8 col-0">
+</div>
+</div>
+<br>
+
+</div>
+
+
+<script>
+document.getElementById("request")
+	.addEventListener("submit", (event) => {
+		event.preventDefault();
+		console.log('request button clicked');
+		const name = event.target.name.value;
+		const mob = event.target.number.value;
+
+			return fetch("/requestAsAdmin", {
+				method: "POST",
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/json",
+					"CSRF-Token": Cookies.get("XSRF-TOKEN"),
+				},
+				body: JSON.stringify({name:name,mob:mob}),
+			}).then((status)=>{
+				alert('successfully requested ');
+			});
+});
+</script>
+</body>
+</html>

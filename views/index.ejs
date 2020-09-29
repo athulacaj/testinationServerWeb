@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+
+	<%-include('header')%>
+
+</head>
+<link rel="stylesheet" href="css/meatIndex.css">
+<link rel="stylesheet" href="css/index.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<body>
+<div class="other">
+	<%-include('appBar')%>
+<div class="container">
+	<br>
+	<div class="row">
+	  <div class="col-sm-9 col-0">
+</div>
+<div class="col-sm-3 col-12" style="text-align:center;">
+	<div class="card">
+		<!-- <span id='edit' style="font-size:15px;color:blue"> edit</span> -->
+		<br>
+		<h5 class="card-title" ><span id='name'><%=data['name']%></span>  </h5>
+		<!-- <p class="card-title"><%=data['role']%></p> -->
+		<a href="" class="btn btn-secondary">Logout</a>
+</div>
+</div>
+</div>
+<br>
+	<div class="row">
+	  <div class="col-sm-6">
+	    <div class="card">
+	      <div class="card-body">
+	        <h5 class="card-title">Create Questions</h5>
+	        <p class="card-text">Select this if you are adding your questions for first time</p>
+	        <a href="/addQuestions" class="btn btn-primary">Create</a>
+	      </div>
+	    </div>
+	  </div>
+	  <div class="col-sm-6">
+	    <div class="card">
+	      <div class="card-body">
+	        <h5 class="card-title">Edit Questions</h5>
+	        <p class="card-text">Edit previousily added questions , add more question  & delete questions</p>
+	        <a href="/editQuestions" class="btn btn-primary">Edit</a>
+	      </div>
+	    </div>
+	  </div>
+
+		<!-- view requests  -->
+<%if(data['role']==='superAdmin'){%>
+	<div class="col-sm-6">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">Manage Admin Request</h5>
+				<p class="card-text">Add admins by accepting request</p>
+				<a href="/manageAdminRequest" class="btn btn-primary">Manage</a>
+			</div>
+		</div>
+	</div
+<%}%>
+
+	</div>
+
+</div>
+
+
+<script>
+$('#edit').on("click",function(){
+	var name = prompt("Change your name", "Race solutions");
+$('#name').html(name);
+});
+</script>
+</body>
+</html>

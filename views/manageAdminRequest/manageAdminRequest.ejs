@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+
+	<%-include('header')%>
+
+</head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js" defer ></script>
+<style media="screen">
+	.addMargin{
+		margin-bottom:10px;
+	}
+</style>
+<body>
+<div class="other">
+	<%-include('../appBar')%>
+<div class="container">
+	<br>
+	<h4>Admin requests</h4>
+	<br>
+	<div class="row">
+<%for(var i in data){%>
+	  <div class="col-sm-12 col-md-6 col-lg-4">
+			<div class="card" >
+  <div class="card-header">
+    <%=data[i]['name']%>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item"><%=data[i]['mob']%></li>
+    <li class="list-group-item">
+			<button class="btn btn-sm btn-info addMargin" onclick="admin(<%=i%>,'admin')">Make Admin</button>
+				<button class="btn btn-sm btn-success addMargin" onclick="admin(<%=i%>,'superAdmin')">MakeSuperAdmin</button>
+					<button class="btn btn-sm btn-danger addMargin" onclick="admin(<%=i%>,'delete')">Delete</button>
+		</li>
+  </ul>
+</div>
+
+</div>
+<%}%>
+</div>
+
+<br>
+
+</div>
+
+
+<script>
+var dataFromEjs = <%-JSON.stringify(data) %>;
+
+function admin(i,type){
+var index=parseInt(i);
+var name=dataFromEjs[i]['name'];
+var mob=dataFromEjs[i]['mob'];
+var role='admin';
+var uid=dataFromEjs[i]['id'];
+
+if(type=='superAdmin'){
+	role='superAdmin'
+}
+if(type=='delete'){
+	saveData(name,role,uid,mob,false);
+}else{
+	saveData(name,role,uid,mob,true);
+}
+}
+
+function saveData(name,role,uid,mob,isSave){
+			console.log('is saving '+isSave);
+				return fetch("/manageAdminRequest", {
+					method: "POST",
+					headers: {
+						Accept: "application/json",
+						"Content-Type": "application/json",
+						"CSRF-Token": Cookies.get("XSRF-TOKEN"),
+					},
+					body: JSON.stringify({name:name,uid:uid,mob:mob,role:role,isSave:isSave}),
+				}).then((status)=>{
+					location.reload();
+
+				});
+
+}
+
+</script>
+</body>
+</html>

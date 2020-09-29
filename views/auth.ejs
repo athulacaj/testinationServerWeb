@@ -1,0 +1,264 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document
+    </title>
+    <%-include('header')%>
+
+  </head>
+  <!-- <link rel="stylesheet" href="css/auth.css" /> -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js" defer ></script>
+  <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-auth.js" defer ></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js" defer ></script>
+<style media="screen">
+#second{
+  display: none;
+}
+.wi{
+  width:50%;
+  margin: auto;
+}
+.center{
+  /* text-align: center; */
+  align-items: center;
+}
+</style>
+  <body>
+    <%-include('appBar')%>
+
+    <!-- Add two inputs for "phoneNumber" and "code" -->
+    <br>
+    <div class="container">
+
+    <div class="center">
+      <div class="wi">
+
+      <form id="login">
+        <div class="form-group">
+        <section id='first'>
+          <div class="form-group">
+          <label for="">Phone no :</label>
+          <input type="tel" value="+91"class="form-control"  id="phoneNumber" />
+        </div>
+          <div class="captcha">
+            <div id="recaptcha-container"></div>
+          </div>
+          <br>
+          <button type='button' class="btn btn-primary btn-block" id="sign-in-button" onclick="submitPhoneNumberAuth()">
+            SIGN IN WITH PHONE
+          </button>
+          <br>
+        </section>
+        <section id="second">
+          <label>Otp</label>
+          <input type="number" class="form-control" id="code" />
+          <br>
+          <button type='button' class="btn btn-primary btn-block" id="confirm-code" onclick="submitPhoneNumberAuthCode()">
+            ENTER CODE
+          </button>
+        </section>
+
+
+  </div>
+  </form>
+</div>
+</div>
+</div>
+    <!-- Add two buttons to submit the inputs -->
+
+    <!-- Add a container for reCaptcha -->
+
+
+    <script>
+    window.addEventListener("DOMContentLoaded", () => {
+
+      // Paste the config your copied earlier
+      
+  var firebaseConfig = {
+    apiKey: "AIzaSyDuygQMOc1RYZrdv1mb4Wzn9B9Bq_RWn18",
+    authDomain: "testination-e6442.firebaseapp.com",
+    databaseURL: "https://testination-e6442.firebaseio.com",
+    projectId: "testination-e6442",
+    storageBucket: "testination-e6442.appspot.com",
+    messagingSenderId: "244418241418",
+    appId: "1:244418241418:web:faf39ef6d1582f76a6de73",
+    measurementId: "G-2D2S943ZFE"
+  };
+
+      firebase.initializeApp(firebaseConfig);
+      firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+
+      // Create a Recaptcha verifier instance globally
+      // Calls submitPhoneNumberAuth() when the captcha is verified
+      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
+        "recaptcha-container",
+        {
+          size: "normal",
+          callback: function(response) {
+            $('.captcha').css('display','none');
+            $('#first').css('display','none');
+            $('#second').css('display','block');
+            submitPhoneNumberAuth();
+          }
+        }
+      );
+
+      // This function runs when the 'sign-in-button' is clicked
+      // Takes the value from the 'phoneNumber' input and sends SMS to that phone number
+      //This function runs everytime the auth state changes. Use to verify if the user is logged in
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          console.log("USER LOGGED IN");
+
+
+          return firebase.auth().currentUser.getIdToken().then((idToken) => {
+            console.log('got token');
+            return fetch("/sessionLogin", {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                "CSRF-Token": Cookies.get("XSRF-TOKEN"),
+              },
+              body: JSON.stringify({ idToken }),
+            });
+          })
+           .then(() => {
+              return firebase.auth().signOut();
+            })
+            .then(() => {
+              window.location.assign("/");
+            });
+//
+//
+
+        } else {
+          // No user is signed in.
+          console.log("USER NOT LOGGED IN");
+        }
+      });
+})
+function submitPhoneNumberAuth() {
+  var phoneNumber = document.getElementById("phoneNumber").value;
+  var appVerifier = window.recaptchaVerifier;
+  firebase
+    .auth()
+    .signInWithPhoneNumber(phoneNumber, appVerifier)
+    .then(function(confirmationResult) {
+      window.confirmationResult = confirmationResult;
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+}
+
+// This function runs when the 'confirm-code' button is clicked
+// Takes the value from the 'code' input and submits the code to verify the phone number
+// Return a user object if the authentication was successful, and auth is complete
+function submitPhoneNumberAuthCode() {
+  var code = document.getElementById("code").value;
+  confirmationResult
+    .confirm(code)
+    .then(function(result) {
+      var user = result.user.uid;
+      console.log(user);
+      // sending credential to serever
+      // var token = await FirebaseAuth.instance.currentUser().getIdToken();
+
+
+      //
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+}
+
+
+    </script>
+  </body>
+</html>
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Firebase Server Auth</title>
+    <link rel="stylesheet" href="css/mvp.css" />
+    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js" defer ></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-auth.js" defer ></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js" defer ></script>
+  </head>
+  <body>
+    <main>
+      <section>
+        <form id="login">
+          <label>Login</label>
+          <input type="text" name="login" />
+          <label>Password</label>
+          <input type="password" name="password" />
+          <button>Log in</button>
+        </form>
+      </section>
+
+      <script>
+
+        window.addEventListener("DOMContentLoaded", () => {
+          var firebaseConfig = {
+    apiKey: "AIzaSyA_BgDAJvhG2BQBfjjvRcVV8IYQfRSVsBQ",
+    authDomain: "testination-44458.firebaseapp.com",
+    databaseURL: "https://testination-44458.firebaseio.com",
+    projectId: "testination-44458",
+    storageBucket: "testination-44458.appspot.com",
+    messagingSenderId: "1022923643268",
+    appId: "1:1022923643268:web:cf84f567390fd658bb25d1"
+    };
+
+            // Initialize Firebase
+          firebase.initializeApp(firebaseConfig);
+
+          firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+
+          document
+            .getElementById("login")
+            .addEventListener("submit", (event) => {
+              event.preventDefault();
+              const login = event.target.login.value;
+              const password = event.target.password.value;
+
+              firebase
+                .auth()
+                .signInWithEmailAndPassword(login, password)
+                .then(({ user }) => {
+                  alert('sucees');
+                  return user.getIdToken().then((idToken) => {
+                    return fetch("/sessionLogin", {
+                      method: "POST",
+                      headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json",
+                        "CSRF-Token": Cookies.get("XSRF-TOKEN"),
+                      },
+                      body: JSON.stringify({ idToken }),
+                    });
+                  });
+                })
+                .then(() => {
+                  return firebase.auth().signOut();
+                })
+                .then(() => {
+                  window.location.assign("/");
+                });
+              return false;
+            });
+        });
+      </script>
+    </main>
+  </body>
+</html> -->

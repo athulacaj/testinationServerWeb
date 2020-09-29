@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <%-include('header')%>
+  </head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js" defer ></script>
+
+  <!-- <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.2/dist/jquery.validate.min.js
+"></script> -->
+<style media="screen">
+.green{
+  color: green;
+}
+.myButton{
+  margin-bottom: 10px;
+}
+#show > p,#show1 > p{
+  padding: 8px;
+  padding-left: 20px;
+    margin:2px;
+  border-radius: 6px;
+  background-color: white;
+}
+.addButton{
+  width: 33.3%;
+}
+@media only screen and (max-width: 768px) {
+  /* .container {
+    padding: 30px;
+  } */
+  .sidebar{
+    margin-top:20px;
+  }
+  .addButton{
+    width: 100%;
+  }
+}
+@media only screen and (min-width: 768px) {
+  .sidebar{
+    min-height: 700px;
+  }
+
+}
+
+
+/* from css validator */
+#field { margin-left: .5em; float: left; }
+#field, label { float: left; font-family: Arial, Helvetica, sans-serif; font-size: small; }
+br { clear: both; }
+input { border: 1px solid black; margin-bottom: .5em;  }
+input.error { border: 1px solid red; }
+label.error {
+	background: url('/images/unchecked.gif') no-repeat;
+	padding-left: 16px;
+	margin-left: .3em;
+}
+label.valid {
+	background: url('/images/checked.gif') no-repeat;
+	display: block;
+	width: 16px;
+	height: 16px;
+}
+
+</style>
+<link rel="stylesheet" href="https://jqueryvalidation.org/files/demo/site-demos.css">
+
+  <body>
+    <%-include('../../appBar')%>
+
+    <div class="container-fluid">
+      <div class="row">
+        <!-- left side -->
+        <div class="col-md-3 col-12  jumbotron sidebar" style="padding:10px">
+        <div id='show'>
+        </div>
+        <div id='show1'>
+        </div>
+        <br><br>
+        <div class="addButton" style="margin:auto">
+          <button type="button" class="btn btn-info btn-block" onclick="save()">Save</button>
+        </div>
+        </div>
+
+
+        <!-- right side -->
+      <div class="col-md-9 col-12 order-first order-md-last " style="padding-left:40px">
+
+    	<br>
+      <!-- name of bundle -->
+    	<div class="row">
+
+            <form id='bundle'>
+              <div class="form-row">
+                <div class="col-md-4 mb-3">
+
+                  <label for="validationServer01" >Name</label>
+                  <input type="text" value="<%=data['allDetails']['name']%>" name="bundleName" class="form-control " id="bundleName" placeholder="name show in category"  required>
+
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label for="validationServer02">Amount( ₹ )</label>
+                  <input type="number" value=<%=data['allDetails']['amount']%> name="amount" class="form-control " id="amount" placeholder="amount"  required>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label for="validationServerUsername">Category</label>
+                  <div class="form-group">
+   <select id='category' name="category" class="custom-select form-control" required>
+     <option ><%=data['allDetails']['category']%></option>
+     <%categories=data['availableCatgeories']%>
+     <%for(var i in categories){%>
+     <option value="<%=categories[i]%>"><%=categories[i]%></option>
+     <%}%>
+
+   </select>
+   <br>
+   <div class="invalid-feedback">Example invalid custom select feedback</div>
+ </div>
+</div>
+              </div>
+              <div class="addButton">
+                <button class="btn btn-outline-primary btn-block" onclick="addBundle()" type="submit">add</button>
+
+              </div>
+            </form>
+
+    	  </div>
+<br><hr>
+<br>
+ <!-- add new test or
+  test -->
+ <div id='testInfo'>
+
+ </div>
+<br>
+<!-- test details -->
+<div class="row">
+
+      <form id="test">
+        <div class="form-row">
+          <div class="col-md-4 mb-3">
+            <label for="validationServer01">Test Name</label>
+            <input type="text" name="testName" class="form-control " id="testName" placeholder="name of test"  required>
+
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="validationServer02">Total questions</label>
+            <input type="number"name="totalQuestions" class="form-control " id="totalQuestions" placeholder="no of questions"  required>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="validationServer02">Total time</label>
+            <input type="number" name="totalTime" class="form-control " id="totalTime" placeholder="time in minutes"  required>
+          </div>
+        </div>
+        <div class="col-auto">
+     <div class="form-check mb-2">
+       <input name="free" class="form-check-input" type="checkbox" id="free">
+       <label class="form-check-label" for="autoSizingCheck">
+         Free
+       </label>
+     </div>
+   </div>
+   <br><br>
+   <input type="file" class="form-control " id="my_file_input" />
+ <div id='my_file_output'></div>
+ <br>
+   <br>
+   <div class="row">
+     <div class="col-4">
+       <button class="btn btn-outline-primary btn-block" type="submit">add</button>
+     </div>
+     <div class="col-4">
+       <button class="btn btn-outline-danger btn-block" onclick="deleteTest()" type="button">delete test</button>
+     </div>
+   </div>
+       </form>
+  </div>
+</div>
+
+
+    	</div>
+
+      <br>
+      <br>
+
+</div>
+<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+ <!-- Excel cdn below -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
+
+<script type="text/javascript">
+
+var valid1=false;
+var valid2=false;
+
+
+jQuery.validator.setDefaults({
+  debug: false,
+  success: "valid"
+});
+
+function addBundle(){
+
+  }
+
+
+      $('#bundle').submit(function () {
+        var form = $( "#bundle" );
+          if(form.valid()) {
+             valid1=true;
+            h1="<P class=''>name: "+$('#bundleName').val()+" ,</P>";
+            h2="<P class=''> amount: "+$('#amount').val()+" ,</P>";
+            h3="<P class=''> category: "+$('#category').val()+" ,</P>";
+
+           $("#show").append(h1+h2+h3);
+          }
+          event.preventDefault();
+
+return true;
+      });
+// test add section
+
+var testNo=1;
+var testList=[{'name':'untitiled Test'+testNo,'totalQuestions':0,'totalTime':0,'free':false,'test':[]}];
+
+
+var selectedTest=0;
+// adding test to ui or building test base on testList
+function buidTestButtons(){
+  $("#testInfo").empty();
+  for(var i in testList){
+    if(selectedTest==i){
+      btn="<button class='btn btn-large btn-dark myButton' onClick='selectTest("+i+")'>"+testList[i]['name']+"</button> &nbsp"
+      $("#testInfo").prepend(btn);
+    }else{
+      btn="<button class='btn btn-large btn-light myButton' onClick='selectTest("+i+")'>"+testList[i]['name']+"</button> &nbsp"
+      $("#testInfo").prepend(btn);
+    }
+}
+addBtn="<button onclick='addMoreTest()' class='btn btn-sm btn-info myButton'>+</button>"
+$("#testInfo").append(addBtn);
+changeValues();
+
+}
+
+// geting ejs data and adding to list
+function addTestListFromEjs(){
+  testList=[];
+  var parsedData = <%- JSON.stringify(data) %>
+  var data=parsedData['allDetails'];
+  var tests=parsedData['allDetails']['tests'];
+  for( var i in tests){
+    testList.push({'name':tests[i]['name'],'questions':tests[i]['questions'],'duration':tests[i]['duration'],'free':tests[i]['free'],'test':tests[i]['test']});
+  }
+  buidTestButtons();
+
+}
+addTestListFromEjs();
+
+
+// delete test
+function deleteTest(){
+  delete testList[selectedTest];
+  if(selectedTest==0){
+    selectedTest=0;
+  }else {
+    selectedTest=selectedTest-1;
+  }
+  buidTestButtons();
+}
+
+// when + clicked by user;
+function addMoreTest(){
+  testNo++;
+testList.push({'name':'untitiled Test'+testNo,'questions':0,'duration':0,'free':false,'test':[]});
+buidTestButtons();
+}
+// when buidTestButton clicked by user change selection color or selectedTest and rebuild ui
+function selectTest(i){
+  selectedTest=parseInt(i);
+  buidTestButtons();
+  changeValues();
+}
+// change value according to selection
+function changeValues(){
+  $('#testName').val(testList[selectedTest]['name']);
+  $('#totalQuestions').val(testList[selectedTest]['questions']);
+  $('#totalTime').val(testList[selectedTest]['duration']);
+  // $('#Free').val(testList[selectedTest]['free']);
+  if(testList[selectedTest]['free']){
+    $( "#free").prop('checked', true);
+  }else{
+    $( "#free").prop('checked', false);
+  }
+
+}
+
+$("#free").change(function() {
+    if($(this).prop('checked')) {
+      testList[selectedTest]['free']=true;
+    } else {
+  testList[selectedTest]['free']=false;
+ }
+});
+ $('#testName').on('input',function(e){
+   testList[selectedTest]['name']=this.value;
+   buidTestButtons();
+ });
+ $('#totalQuestions').on('input',function(e){
+   testList[selectedTest]['questions']=this.value;
+   buidTestButtons();
+ });
+ $('#totalTime').on('input',function(e){
+   testList[selectedTest]['duration']=this.value*60;
+   buidTestButtons();
+ }); // changing value if changing
+
+// add test data to right side
+ $('#test').submit(function () {
+   event.preventDefault();
+   $("#show1").empty();
+   var form = $( "#test" );
+     if(form.valid()) {
+       valid2=true;
+$("#show1").append("<p>tests: [</p>");
+for(var i in testList){
+  h1="<P class=''>{ name: "+testList[i]['name']+" ,</P>";
+  h2="<P class=''> duration: "+testList[i]['duration']+" ,</P>";
+  h3="<P class=''> questions: "+testList[i]['questions']+" ,</P>";
+  h4="<P class=''> free: "+testList[i]['free']+"  ,</P>";
+  h5="<P class=''> question count:"+testList[i]['test'].length+" } ,</P>";
+ $("#show1").append(h1+h2+h3+h4+h5);
+}
+$("#show1").append("<p>&nbsp &nbsp &nbsp &nbsp ] ,</p>");
+     }
+
+ });
+
+
+
+// read excel data
+
+function fileReader(oEvent) {
+  testList[selectedTest]['test']=[];
+  testToUpload=[];
+      var oFile = oEvent.target.files[0];
+      var sFilename = oFile.name;
+
+      var reader = new FileReader();
+      var result = {};
+      reader.onload = function (e) {
+          var data = e.target.result;
+          data = new Uint8Array(data);
+          var workbook = XLSX.read(data, {type: 'array'});
+          // console.log(workbook);
+          var result = {};
+
+
+          workbook.SheetNames.forEach(function (sheetName) {
+              var roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header: 1});
+              if (roa.length) result[sheetName] = roa;
+          });
+          // see the result, caution: it works after reader event is done.
+          console.log(result['Sheet1']);
+          // alert(result['Sheet1'][8][1]);
+          var i=0;
+          result['Sheet1'].forEach(function(item,index){
+            if(item.length>7){
+              if(i!=0){
+                var answerIndex=parseInt(item[7]);
+                // var newDiv = $('<div><h5>'+item[1]+'</h3>'+item[answerIndex+1]+'</div>');
+                // $('#show1').append(newDiv);
+var toAdd={'question':item[1],
+'answerIndex':answerIndex-1,
+'options':[
+item[2],item[3],item[4],item[5],
+],};
+testList[selectedTest]['test'].push(toAdd);
+              }
+              i=i+1;
+            }
+          });
+
+      };
+      // console.log(testList);
+      reader.readAsArrayBuffer(oFile);
+}
+
+// Add your id of "File Input"
+$('#my_file_input').change(function(ev) {
+      // Do something
+      fileReader(ev);
+})
+
+
+function save(){
+  if(valid1==true&&valid2==true){
+  var url=window.location.href;
+  var res = url.split("/").reverse();
+  var route=res[3]+'/'+res[2]+'/'+res[1]+'/'+res[0];
+// alert(route);
+  // after geting route
+  var bundleName=$('#bundleName').val();
+  var amount=$('#amount').val();
+  var category=$('#category').val();
+
+  return fetch("/editQuestions/"+route, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "CSRF-Token": Cookies.get("XSRF-TOKEN"),
+    },
+    body: JSON.stringify({
+name:bundleName,
+uid:'',
+amount:parseInt(amount),
+category:category,
+      tests:testList }),
+  })
+ .then(() => {
+   // window.location.assign("/");
+  })
+}else {
+  alert('add data before saving');
+}
+}
+
+</script>
+  </body>
+</html>

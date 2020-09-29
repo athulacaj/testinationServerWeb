@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <title></title>
+
+
+
+  </head>
+  <body>
+    <input type="file" id="my_file_input" />
+  <div id='my_file_output'></div>
+<p id='toAdd'>
+
+</p>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/7.17.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.17.2/firebase-firestore.js"></script>
+
+  </body>
+
+<script type="text/javascript">
+
+var config = {
+    apiKey: "AIzaSyA_BgDAJvhG2BQBfjjvRcVV8IYQfRSVsBQ",
+    authDomain: "testination-44458.firebaseapp.com",
+    databaseURL: "https://testination-44458.firebaseio.com",
+    projectId: "testination-44458",
+    storageBucket: "testination-44458.appspot.com",
+    messagingSenderId: "1022923643268",
+    appId: "1:1022923643268:web:cf84f567390fd658bb25d1"
+  };
+  // Initialize Firebase
+  // firebase.initializeApp(firebaseConfig);
+  var app = firebase.initializeApp(config);
+  var db = firebase.firestore(app);
+
+
+  function fileReader(oEvent) {
+        var oFile = oEvent.target.files[0];
+        var sFilename = oFile.name;
+
+        var reader = new FileReader();
+        var result = {};
+
+        reader.onload = function (e) {
+            var data = e.target.result;
+            data = new Uint8Array(data);
+            var workbook = XLSX.read(data, {type: 'array'});
+            // console.log(workbook);
+            var result = {};
+
+
+            workbook.SheetNames.forEach(function (sheetName) {
+                var roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header: 1});
+                if (roa.length) result[sheetName] = roa;
+            });
+            // see the result, caution: it works after reader event is done.
+            console.log(result['Sheet1']);
+            // alert(result['Sheet1'][8][1]);
+            var i=0;
+            var testToUpload=[];
+            result['Sheet1'].forEach(function(item,index){
+              if(item.length>7){
+                if(i!=0){
+                  var answerIndex=parseInt(item[7]);
+                  var newDiv = $('<div><h5>'+item[1]+'</h3>'+item[answerIndex+1]+'</div>');
+                  $('#toAdd').append(newDiv);
+var toAdd={'question':item[1],
+'answerIndex':answerIndex-1,
+'options':[
+  item[2],item[3],item[4],item[5],
+],};
+testToUpload.push(toAdd);
+                }
+                i=i+1;
+              }
+            });
+
+
+            var citiesRef = db.collection("openRoom/ias/all");
+            citiesRef.add({
+        uid:'',      
+allDetails:  {amount: 1,
+  author: 'race solutions', name: 'Race Solutions',
+  tests:[
+  {'duration':1200,'free':true,'name':'Mock Test 1','questions':20,'test':testToUpload}
+  ]
+} });
+        };
+        reader.readAsArrayBuffer(oFile);
+}
+
+// Add your id of "File Input"
+$('#my_file_input').change(function(ev) {
+        // Do something
+        fileReader(ev);
+})
+</script>
+</html>

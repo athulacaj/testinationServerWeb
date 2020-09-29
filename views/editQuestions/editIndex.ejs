@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <%-include('header')%>
+  </head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <%-include('../appBar')%>
+
+  <body>
+    <div class="container">
+    	<br>
+    	<div class="row">
+        <% var questionDetails=data['questionDetails']%>
+        <%for(var i in questionDetails){%>
+<% if(questionDetails[i]['category']==data['categoySelected']){%>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title"><%=questionDetails[i]['name']%></h5>
+        <p class="card-text">Add question from excel sheet</p>
+        <a href="/editQuestions/<%=questionDetails[i]['category']%>/<%=questionDetails[i]['id']%>/byExcel/<%=i%>" class="btn btn-primary">Edit</a>
+      </div>
+    </div>
+  </div>
+<%}%>
+
+        <%}%>
+
+    	</div>
+
+    </div
+  </body>
+</html>
