@@ -110,7 +110,7 @@ label.valid {
                   <label for="validationServerUsername">Category</label>
                   <div class="form-group">
    <select id='category' name="category" class="custom-select form-control" required>
-     <option ><%=data['allDetails']['category']%></option>
+     <option ><%-data['allDetails']['category']%></option>
      <%categories=data['availableCatgeories']%>
      <%for(var i in categories){%>
      <option value="<%=categories[i]%>"><%=categories[i]%></option>

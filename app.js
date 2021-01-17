@@ -396,6 +396,10 @@ res.end(JSON.stringify({ status: "success" }));
 
 });
 
+app.get('/addNotes',checkAdmin,function(req,res){
+  res.render('addData/addNotes')
+});
+
 app.listen(PORT, () => {
   console.log(`Listening on http://localhost:${PORT}`);
 });

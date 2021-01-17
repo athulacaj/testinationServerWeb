@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <%-include('header')%>
+  </head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<style>
+  .screen{
+    background-color:#e9f1e8;
+    /* border: 1px solid black; */
+    /* height: 200px; */
+    width: 100%;
+    padding: 20px;
+  }
+  .imgSm{
+    width: 50px;
+    height: 50px;
+  }
+  .imgSmS{
+    width: 50px;
+    height: 50px;
+    /* margin: 12px; */
+  }
+  .imgSmM{
+    width: 100px;
+    height: 100px;
+    /* margin: 12px; */
+  }
+  .imgSmL{
+    width: 100%;
+    display: block;
+    max-height: 220px;
+  }
+</style>
+<body>
+    <%-include('../appBar')%>
+    <br><br>
+    <div class="container">
+<button class="btn btn-sm btn-warning" onclick="bold()">Bold</button>
+      <div class="row">
+        <div class="col-12 col-md-7">  
+          
+          <div class="form-group">
+            <label for="text">Enter Notes</label>
+            <textarea class="form-control" id="text" rows="6"></textarea>
+          
+          
+          </div>
+        
+
+            <br>
+            <input type="file" id="photo" />
+            
+            <!-- <button onclick="uploadImage()">Upload Image</button> -->
+          <br><br>
+          <div id="imageViewer"></div>
+          <br>
+          <div id="imageButton"></div>
+          <br>
+          <p>Image Properties</p>
+          <select class="form-control" id="size" name="size">
+            <option value="S">small</option>
+            <option value="M">medium</option>
+            <option value="L">large</option>
+          </select>
+          <br> 
+<button onclick="add()" class="btn btn-success">Add Image</button>
+<br><br>
+          </div>
+        <div class="col-12 col-md-5 screen">
+  <div id="viewer"></div>
+          
+  
+          </div>
+        </div>
+      
+      
+      </div>
+    
+
+    </div>
+      
+</body>
+<script defer src="js/addNotes.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/caret/1.3.7/jquery.caret.min.js" integrity="sha512-DR6H+EMq4MRv9T/QJGF4zuiGrnzTM2gRVeLb5DOll25f3Nfx3dQp/NlneENuIwRHngZ3eN6w9jqqybT3Lwq+4A==" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-storage.js"></script>
+<script>
+     var firebaseConfig = {
+    apiKey: "AIzaSyDuygQMOc1RYZrdv1mb4Wzn9B9Bq_RWn18",
+    authDomain: "testination-e6442.firebaseapp.com",
+    databaseURL: "https://testination-e6442.firebaseio.com",
+    projectId: "testination-e6442",
+    storageBucket: "testination-e6442.appspot.com",
+    messagingSenderId: "244418241418",
+    appId: "1:244418241418:web:faf39ef6d1582f76a6de73",
+    measurementId: "G-2D2S943ZFE"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+
+  var images=["https://firebasestorage.googleapis.com/v0/b/testination-e6442.appspot.com/o/addNotes%2F2020%2F11%2F1608354356735-WhatsApp%20Image%202020-12-16%20at%2010.13.26%20AM.jpeg?alt=media&token=e45b0308-1b60-46f8-949a-ff1364272982","https://firebasestorage.googleapis.com/v0/b/testination-e6442.appspot.com/o/addNotes%2F2020%2F11%2F1608322004828-WhatsApp%20Image%202020-12-16%20at%2010.13.26%20AM.jpeg?alt=media&token=c21777d6-c35e-4d22-b30d-93ee8f18aebf"];
+  function uploadImage() {
+        var d = new Date();
+var m = d.getMonth();
+var y = d.getFullYear();
+      const ref = firebase.storage().ref("addNotes/"+ y+"/"+m);
+      const file = document.querySelector("#photo").files[0];
+      const name = +new Date() + "-" + file.name;
+      const metadata = {
+        contentType: file.type
+      };
+      const task = ref.child(name).put(file, metadata);
+      task
+        .then(snapshot => snapshot.ref.getDownloadURL())
+        .then(url => {
+          console.log(url);
+          images.push(url);
+          buildImages();
+          buildImageButton();
+
+        //   document.querySelector("#image").src = url;
+        })
+        .catch(console.error);
+    }
+    $("#photo").change(function(){
+      var imageSize=parseInt($("#photo")[0].files[0].size);
+if(imageSize/1000<200){
+   uploadImage();
+}else{
+  alert('image must be less than 200 kb ');
+}
+   
+        });
+
+  var text="";
+  var cursor;
+  var btnSelected=0;
+  $("#text").click(function(e){
+    cursor=e.target.selectionStart+1;
+    // alert(cursor)
+  });
+  $("#text").keyup(function(e){
+    text=$('#text').val();
+    cursor=e.target.selectionStart-1;
+    if (e.key === 'Enter' || e.keyCode === 13) {
+         var a =  text.slice(0, cursor);
+      var b =  text.slice(cursor);
+       $('#text').val( a+" !--> "+b);
+       cursor=cursor+4;
+  // console.log('Caret at: ', );
+    }
+    buildScreenViewer();
+});
+
+function buildScreenViewer(){
+  var toAdd='';
+  $("#viewer").empty();
+  var paraList=text.split(" !--> ");
+  for(var i in paraList){
+    // let re = <img0/>;
+    var imgSplitList=paraList[i].split(/\<img[A-Z][0-9][0-9]\/\>/);
+    var imgSplitImageTag=paraList[i].split(/\/\>/);  
+    console.log("image is "+imgSplitImageTag[0].slice(-1));
+toAdd=imgSplitList[0];
+    if(imgSplitList.length>1){
+
+      for(var a=1;a<imgSplitList.length;a++){
+var size=imgSplitImageTag[a-1].slice(-3,-2);
+var imageIndex=parseInt(imgSplitImageTag[a-1].slice(-2));
+      var s="<img src='"+images[imageIndex]+" 'class='imgSm"+size+"''>";
+
+toAdd=toAdd+s+imgSplitList[a];
+// console.log("get len="+ text.slice(len-1,len));
+//
+}
+        toAdd="<p>"+toAdd+"</p>";
+
+    }else{
+      toAdd="<p>"+paraList[i]+"</p>"
+    }
+$('#viewer').append(toAdd);
+  }
+  toAdd="<p>"+text+"</p>"
+
+  // $('#viewer').append(toAdd);
+}
+function buildImages(){
+  $("#imageViewer").empty();
+  for(var i in images){
+  
+    // toAdd="<p>"+'text'+"</p>"
+    toAdd="<span><img src='"+images[i]+" 'class='imgSm' onclick='imageClicked("+i+")'>";
+$('#imageViewer').append(toAdd);
+  }
+}
+buildImages();
+buildImageButton();
+function add(){
+ var size= $('#size').val();
+  var i=btnSelected;
+  var a =  text.slice(0, cursor+1);
+      var b =  text.slice(cursor+1);
+       $('#text').val( a+"<img"+size+pad(i)+"/>"+b);
+       text= a+"<img"+size+pad(i)+"/>"+b;
+    //  build image after converting code 
+       buildScreenViewer();
+}
+
+function pad(d) {
+    return (d < 10) ? '0' + d.toString() : d.toString();
+}
+function buildImageButton(){
+  $("#imageButton").empty();
+  for(var i in images){
+    // toAdd="<p>"+'text'+"</p>"
+    if(btnSelected==i){
+      toAdd="<button class='btn btn-primary' onclick='imageButtonClick("+i+")'>"+i+"</button>&nbsp &nbsp";
+    }else{
+      toAdd="<button class='btn btn-secondary' onclick='imageButtonClick("+i+")'>"+i+"</button>&nbsp &nbsp";
+    }
+$('#imageButton').append(toAdd);
+  }
+}
+function imageButtonClick(i){
+  btnSelected=i;
+  buildImageButton();
+}
+
+</script>
+</html>

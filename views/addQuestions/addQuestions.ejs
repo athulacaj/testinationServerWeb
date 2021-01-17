@@ -6,22 +6,28 @@
     <%-include('header')%>
   </head>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
+<style>
+	.space{
+margin-top: 15px;
+	}
+</style>
   <body>
     <%-include('../appBar')%>
 
     <div class="container">
     	<br>
     	<div class="row">
-    	  <div class="col-sm-6">
+    	  <div class="col-sm-12">
     	    <div class="card">
     	      <div class="card-body">
     	        <h5 class="card-title">Add from Excel</h5>
     	        <p class="card-text">Add question from excel sheet</p>
-    	        <a href="/addQuestions/addExcel" class="btn btn-primary">Add( from excel )</a>
+    	        <a href="/addQuestions/addExcel" class="btn btn-primary space">Add( from excel )</a>
               &nbsp
-              <a href="https://firebasestorage.googleapis.com/v0/b/testination-e6442.appspot.com/o/testinationQuestionAddByExcel.xlsx?alt=media&token=2c9d8b6b-10ad-486c-b1c4-c7804d854b09" class="btn btn-info">Download Demo Excel</a>
-    	      </div>
+              <a href="https://firebasestorage.googleapis.com/v0/b/testination-e6442.appspot.com/o/testinationQuestionAddByExcel.xlsx?alt=media&token=2c9d8b6b-10ad-486c-b1c4-c7804d854b09" class="btn btn-info space">Download Demo Excel</a>
+			  
+			  <a href="/addNotes" class="btn btn-primary space">Add Notes</a>
+			</div>
     	    </div>
     	  </div>
     	  <!-- <div class="col-sm-6">
