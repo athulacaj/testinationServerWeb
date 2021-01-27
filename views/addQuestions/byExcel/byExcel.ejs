@@ -373,11 +373,14 @@ getFilesList();
                 var answerIndex=parseInt(item[7]);
                 // var newDiv = $('<div><h5>'+item[1]+'</h3>'+item[answerIndex+1]+'</div>');
                 // $('#show1').append(newDiv);
+console.log(item[8]);
 var toAdd={'question':item[1],
 'answerIndex':answerIndex-1,
 'options':[
 item[2],item[3],item[4],item[5],
-],};
+],
+'solution':item[8],
+};
 testList[selectedTest]['test'].push(toAdd);
               }
               i=i+1;
