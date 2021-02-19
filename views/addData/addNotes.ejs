@@ -158,13 +158,14 @@ var y = d.getFullYear();
       const task = ref.child(name).put(file, metadata);
       task
         .then(function(snapshot){ 
-          console.log(snapshot.ref.fullPath);
-          images.push(snapshot.ref.fullPath);
-          buildImages();
+          // console.log("full path :  "+snapshot.ref.fullPath);
+          // images.push(snapshot.ref.fullPath);
+          // buildImages();
           return snapshot.ref.getDownloadURL()})
         .then(url => {
           console.log(url);
-
+          images.push(url);
+          buildImages();
         //   document.querySelector("#image").src = url;
         })
         .catch(console.error);
@@ -210,6 +211,7 @@ var regex = /\!\!/;
 if (text.match(regex)) {
   text = text.replace(regex, "$1" + "1" + "$2");
 }
+console.log(imgL);
 
 var toReturnList=[];
   for(var i in imgL) {
@@ -217,15 +219,15 @@ var toReturnList=[];
     if(entry.slice(0,4)=='<img'){
       var imgSplitImageTag=entry.split(/src\=\'(.*)\'\s/gs); 
  var objectKey=''+imgSplitImageTag[1];
-      // let id=Symbol(imgSplitImageTag[1]);
       var url=imagesMap[objectKey];
       if(url==null){
-      var url=await imageLink(imgSplitImageTag[1]);
+      // var url=await imageLink(imgSplitImageTag[1]);
+      var url=imgSplitImageTag[1];
       imagesMap[objectKey]=url;
       }
 
-      // alert(url);
       var s="<img src='"+url+"'"+imgSplitImageTag[2];
+      // var s=imgL[1];
       toReturnList.push(s)
     }else{
       toReturnList.push(entry)
@@ -237,11 +239,6 @@ var toReturnList=[];
 
 
 
-  // var imgSplitImageTag=text.split(/src\=\'(.*)\'\s/gs);  
-  // var result = s.match(/(?<=cow\s*).*?(?=\s*milk)/gs); // Same but whitespaces are optional
-
-// console.log('image split ='+imgSplitImageTag);
-// console.log('image lenth  ='+imgSplitImageTag.length);
 
   $("#viewer").empty();
     toAdd="<p>"+imageAddedString+"</p>"
@@ -257,11 +254,11 @@ async function buildImages(){
   $("#imageViewer").empty();
   
   for(var i in images){
-    var imgLink=await imageLink(images[i]);
+    // var imgLink=await imageLink(images[i]);
     if(btnSelected==i){
-      toAdd="<span><img src='"+imgLink+" 'class='defaultImg img"+i+" imgSm imageSelected' onclick='imageButtonClick("+i+")'>";
+      toAdd="<span><img src='"+images[i]+" 'class='defaultImg img"+i+" imgSm imageSelected' onclick='imageButtonClick("+i+")'>";
     }else{
-      toAdd="<span><img src='"+imgLink+" 'class='defaultImg img"+i+" imgSm' onclick='imageButtonClick("+i+")'>";
+      toAdd="<span><img src='"+images[i]+" 'class='defaultImg img"+i+" imgSm' onclick='imageButtonClick("+i+")'>";
 
     }
 $('#imageViewer').append(toAdd);
@@ -275,7 +272,7 @@ function add(){
   var a =  text.slice(0, cursor+1);
       var b =  text.slice(cursor+1);
       //  $('#text').val( a+"<img"+size+pad(i)+"/>"+b);
-       var img="!!<img src='"+images[i]+"'  class='imgSm"+size+"'>!!";
+       var img="!!<img src='"+images[btnSelected]+"'  class='imgSm"+size+"'>!!";
        text= a+' '+img+' '+b;
 
        document.execCommand("insertText", false, img);
