@@ -143,10 +143,10 @@ label.valid {
             <input type="text" name="testName" class="form-control " id="testName" placeholder="name of test"  required>
 
           </div>
-          <div class="col-md-4 mb-3">
+          <!-- <div class="col-md-4 mb-3">
             <label for="validationServer02">Total questions</label>
             <input type="number"name="totalQuestions" class="form-control " id="totalQuestions" placeholder="no of questions"  required>
-          </div>
+          </div> -->
           <div class="col-md-4 mb-3">
             <label for="validationServer02">Total time</label>
             <input type="number" name="totalTime" class="form-control " id="totalTime" placeholder="time in minutes"  required>
@@ -220,7 +220,7 @@ return true;
 // test add section
 
 var testNo=1;
-var testList=[{'name':'untitiled Test'+testNo,'totalQuestions':0,'totalTime':0,'free':false,'test':[]}];
+var testList=[{'name':'untitiled Test'+testNo,'totalQuestions':0,'totalTime':0,'free':false,'test':[],'section':[]}];
 var selectedTest=0;
 buidTestButtons();
 // adding test to ui or building test base on testList
@@ -367,13 +367,18 @@ getFilesList();
           // console.log(result['Sheet1']);
           // alert(result['Sheet1'][8][1]);
           var i=0;
-          result['Sheet1'].forEach(function(item,index){
+          result['Questions'].forEach(function(item,index){
             if(item.length>7){
               if(i!=0){
                 var answerIndex=parseInt(item[7]);
                 // var newDiv = $('<div><h5>'+item[1]+'</h3>'+item[answerIndex+1]+'</div>');
                 // $('#show1').append(newDiv);
-console.log(item[8]);
+// console.log(item[5]);
+if(item[8]){
+
+}else{
+  // console.log("solution null");
+}
 var toAdd={'question':item[1],
 'answerIndex':answerIndex-1,
 'options':[
@@ -386,9 +391,40 @@ testList[selectedTest]['test'].push(toAdd);
               i=i+1;
             }
           });
+          testList[selectedTest]['questions']=i-1;
+
+
+
+          // reding section chart
+          c=0
+      result['Section Chart'].forEach(function(item,index){
+            if(item.length>3){
+              if(c!=0){
+              var toAdd={
+              'title':item[1],
+              'f':parseInt(item[2]),
+              'l':parseInt(item[3]),
+              'instruction':item[4],
+              'paragraph':item[5],
+              'mark':item[6],
+              'negative':item[7]
+            };
+testList[selectedTest]['section'].push(toAdd);
+              }
+              console.log(testList[selectedTest]['section']);
+              }
+            
+            c=c+1;
+          }
+            );
+      
 
       };
-      // console.log(testList);
+      
+
+     
+      
+
       reader.readAsArrayBuffer(oFile);
 }
 
